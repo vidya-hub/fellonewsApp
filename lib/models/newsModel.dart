@@ -1,3 +1,7 @@
+// To parse this JSON data, do
+//
+//     final news = newsFromJson(jsonString);
+
 import 'dart:convert';
 
 News newsFromJson(String str) => News.fromJson(json.decode(str));
@@ -58,7 +62,7 @@ class Article {
         url: json["url"],
         urlToImage: json["urlToImage"],
         publishedAt: DateTime.parse(json["publishedAt"]),
-        content: json["content"] == null ? null : json["content"],
+        content: json["content"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -69,7 +73,7 @@ class Article {
         "url": url,
         "urlToImage": urlToImage,
         "publishedAt": publishedAt.toIso8601String(),
-        "content": content == null ? null : content,
+        "content": content,
       };
 }
 
@@ -79,16 +83,40 @@ class Source {
     this.name,
   });
 
-  String id;
-  String name;
+  Id id;
+  Name name;
 
   factory Source.fromJson(Map<String, dynamic> json) => Source(
-        id: json["id"] == null ? null : json["id"],
-        name: json["name"],
+        id: idValues.map[json["id"]],
+        name: nameValues.map[json["name"]],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "name": name,
+        "id": idValues.reverse[id],
+        "name": nameValues.reverse[name],
       };
+}
+
+enum Id { WIRED, BBC_NEWS, REUTERS }
+
+final idValues = EnumValues(
+    {"bbc-news": Id.BBC_NEWS, "reuters": Id.REUTERS, "wired": Id.WIRED});
+
+enum Name { WIRED, BBC_NEWS, REUTERS }
+
+final nameValues = EnumValues(
+    {"BBC News": Name.BBC_NEWS, "Reuters": Name.REUTERS, "Wired": Name.WIRED});
+
+class EnumValues<T> {
+  Map<String, T> map;
+  Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    if (reverseMap == null) {
+      reverseMap = map.map((k, v) => new MapEntry(v, k));
+    }
+    return reverseMap;
+  }
 }
